@@ -12,6 +12,8 @@ const hbs = exphbs.create({
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
+require('./session.js')(app);
+
 const queryString = require('query-string');
 const request = require('request-promise-native');
 const bodyParser = require('body-parser');
@@ -28,8 +30,33 @@ Promise.prototype.thenWait = function thenWait(time) {
 
 const dbPromise = require('./db.js');
 
+app.use(function(req, res, next) {
+  if (req.session.user == null && 
+        (
+          req.originalUrl != '/welcome'
+      &&  req.originalUrl != '/solvepad'
+      &&  req.originalUrl != '/testsolve_url'
+        )
+    ) {
+    if (req.originalUrl == '/') {
+      console.log('redirecting to welcome');
+      res.redirect('/welcome');
+    } else {
+      console.log('redirecting to login');
+      // TODO oauth login and come back
+      res.redirect('/welcome');
+    }
+  } else {
+    console.log('auth ok');
+    next();
+  }
+});
+
 app.get("/", function (req, res) {
-    res.render('home');
+    res.redirect('/event');
+});
+app.get("/welcome", function(req, res) {
+  res.render('home');
 });
 
 var listener = app.listen(process.env.PORT, function () {
