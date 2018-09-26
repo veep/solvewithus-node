@@ -20,7 +20,8 @@
     "s-is": "^1.4.15",
     "sqlite": "^3.0.0",
     "express-session": "^1.15.6",
-    "connect-sqlite3": "^0.9.11"
+    "connect-sqlite3": "^0.9.11",
+    "googleapis": "^34.0.0"
   },
   "engines": {
     "node": "8.x"

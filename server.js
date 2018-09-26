@@ -13,6 +13,7 @@ app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
 
 require('./session.js')(app);
+const googleauth = require('./googleauth.js');
 
 const queryString = require('query-string');
 const request = require('request-promise-native');
@@ -44,7 +45,7 @@ app.use(function(req, res, next) {
     } else {
       console.log('redirecting to login');
       // TODO oauth login and come back
-      res.redirect('/welcome');
+      res.redirect(googleauth.login_url());
     }
   } else {
     console.log('auth ok');
