@@ -31,12 +31,33 @@ Promise.prototype.thenWait = function thenWait(time) {
     return this.then(result => new Promise(resolve => setTimeout(resolve, time, result)));
 };
 
+
+app.get("/", function (req, res) {
+    res.redirect('/event');
+});
+
+app.get("/welcome", function(req, res) {
+  res.render('home');
+});
+
+app.get("/event", function(req, res) {
+  db.User.findById(req.session.userid).then(user => {
+    db.Team.findAll().then(teams => {
+    
+    });
+  })
+  .then(() => {
+    res.render('event_list');
+  });
+});
+
+// auth stuff below, will try to move out of server.js later.
 app.use(function(req, res, next) {
   if ( req.path == '/oauth2callback') {
     next();
     return;
   } 
-  if (req.session.user == null && 
+  if (req.session.userid == null && 
         (
           req.path != '/welcome'
       &&  req.path != '/solvepad'
@@ -57,14 +78,6 @@ app.use(function(req, res, next) {
   }
 });
 
-app.get("/", function (req, res) {
-    res.redirect('/event');
-});
-
-app.get("/welcome", function(req, res) {
-  res.render('home');
-});
-
 app.get("/oauth2callback", function (req, res) {
   googleauth.oauth2Client.getToken(req.query.code)
     .then( token_res =>  {
@@ -78,13 +91,19 @@ app.get("/oauth2callback", function (req, res) {
             display_name: userinfo_res.data.name,
             google_name: userinfo_res.data.email,
             admin: false
-          }})
-          .spread((user, created) => {
-            const user_data = user.get();
-            console.log('user ok', user_data, created);
-            req.session.user_id = user_data.id;
+        }})
+        .spread((user, created) => {
+          const user_data = user.get();
+          console.log('user ok', user_data, 'created: ', created);
+          req.session.userid = user_data.id;
+        })
+        .then(() => {
+          if (req.session.nexturl !== undefined) {
+            res.redirect(req.session.nexturl);
+          } else {
+            res.redirect('/');
+          }
         });
-        res.redirect('/welcome');
       })
       .catch( (err) => {
         console.log('userinfo failure',err);
