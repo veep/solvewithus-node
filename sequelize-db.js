@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const sequelize = new Sequelize('sqlite:.data/puzzles.db', undefined, undefined, { operatorsAliases: false, dialect: 'sqlite' } );
+const sequelize = new Sequelize('puzzles', undefined, undefined, { storage: ".data/puzzles.db", operatorsAliases: false, dialect: 'sqlite' } );
 
 sequelize
   .authenticate()
@@ -17,7 +17,8 @@ const User = sequelize.define(
     id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true },
     google_name: { type: Sequelize.STRING },
     google_id: { type: Sequelize.STRING },
-    display_name: { type: Sequelize.STRING }
+    display_name: { type: Sequelize.STRING },
+    admin: {type: Sequelize.BOOLEAN}
   }
 );
 sequelize.sync();

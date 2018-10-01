@@ -72,12 +72,12 @@ app.get("/oauth2callback", function (req, res) {
       console.log('set credentials');
       googleauth.userinfo()
       .then( userinfo_res => {
-        console.log(userinfo_res.data);
         db.User.findOrCreate({
           where: { google_id: userinfo_res.data.id},
           defaults: { 
             display_name: userinfo_res.data.name,
-            google_name: userinfo_res.data.email
+            google_name: userinfo_res.data.email,
+            admin: false
           }})
           .spread((user, created) => {
             const user_data = user.get();
